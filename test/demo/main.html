@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- ����oojs, ���轫oojs.js���ص���srcĿ¼�� -->
+    <script type="text/javascript" src="/bin/source/oojs.js"></script>
+    <!-- �������ļ���Ŀ¼ -->
+    <script>
+        oojs.setPath('/test/demo/');
+    </script>
+    <script>
+        // ������main.js������, ���Խ�mainֱ��д��ҳ����
+        oojs.define({
+            name: 'main',
+            deps: {
+                template: 'utility.template',
+                template2: 'utility.template'
+
+            },
+            $main: function () {
+                var result = this.template.render('My name is {name}', {
+                    name: 'ZZQ'
+
+                });
+                console.log(result);
+            }
+
+        });
+    </script>
+</body>
+</html>

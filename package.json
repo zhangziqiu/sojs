@@ -1,0 +1,32 @@
+{
+  "name": "sojs",
+  "version": "1.1.0",
+  "description": "Simple Object-Oriented JavaScript",
+  "homepage": "http://www.develop.cc",
+  "license": "BSD-2-Clause",
+  "author": {
+    "name": "zhangziqiu",
+    "email": "zhangziqiu@qq.com"
+  },
+  "maintainers": [
+    {
+      "name": "zhangziqiu",
+      "email": "zhangziqiu@qq.com"
+    }
+  ],
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhangziqiu/sojs.git"
+  },
+  "main": "./bin/format/sojs.js",
+  "dependencies": {},
+  "devDependencies": {
+    "benchmark": "^1.0.0",
+    "mocha": "^2.0.0",
+    "uglify-js": "^2.0.0",
+    "istanbul": "^0.3.22"
+  }
+}
