@@ -1,57 +1,57 @@
 var make = {
     name: 'make',
     sourceFiles: {
-        coreFilePath: './src/oojs.js',
-        eventFilePath: './src/oojs/event.js',
-		promiseFilePath: './src/oojs/promise.js',
-        loaderFilePath: './src/oojs/loader.js'
+        coreFilePath: './src/sojs.js',
+        eventFilePath: './src/sojs/event.js',
+		promiseFilePath: './src/sojs/promise.js',
+        loaderFilePath: './src/sojs/loader.js'
 
     },
     source: {
         result: '',
-        path: './bin/source/oojs.js',
+        path: './bin/source/sojs.js',
         stream: null
 
     },
     format: {
         result: '',
-        path: './bin/format/oojs.js',
+        path: './bin/format/sojs.js',
         stream: null
 
     },
     compress: {
         result: '',
-        path: './bin/compress/oojs.js',
+        path: './bin/compress/sojs.js',
         stream: null
 
     },
     gzip: {
         result: '',
-        path: './bin/gzip/oojs.js.gz',
+        path: './bin/gzip/sojs.js.gz',
         stream: null
 
     },
     sourceCore: {
         result: '',
-        path: './bin/source/oojs.core.js',
+        path: './bin/source/sojs.core.js',
         stream: null
 
     },
     formatCore: {
         result: '',
-        path: './bin/format/oojs.core.js',
+        path: './bin/format/sojs.core.js',
         stream: null
 
     },
     compressCore: {
         result: '',
-        path: './bin/compress/oojs.core.js',
+        path: './bin/compress/sojs.core.js',
         stream: null
 
     },
     gzipCore: {
         result: '',
-        path: './bin/gzip/oojs.core.js.gz',
+        path: './bin/gzip/sojs.core.js.gz',
         stream: null
 
     },

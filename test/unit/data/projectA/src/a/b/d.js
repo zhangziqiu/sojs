@@ -1,0 +1,3 @@
+sojs.define({  
+    name: 'ddd'
+});

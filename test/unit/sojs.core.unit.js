@@ -79,6 +79,36 @@ describe('sojs.core', function () {
             assert.equal(testClass.myName, 'anonymousClass');
         });
 
+        it('define class without name or namespce', function () {
+            var testFilePath = process.cwd()+'/test/unit/data/a-project/src/a/b/';
+            var class_without_test_c = require(testFilePath + 'c.js');
+            assert.equal(class_without_test_c.name, 'c');
+            assert.equal(class_without_test_c.namespace, 'a.b');
+
+            var class_without_test_d = require(testFilePath + 'd.js');
+            assert.equal(class_without_test_d.name, 'ddd');
+            assert.equal(class_without_test_d.namespace, 'a.b');
+
+            var class_without_test_e = require(testFilePath + 'e.js');
+            assert.equal(class_without_test_e.name, 'e');
+            assert.equal(class_without_test_e.namespace, 'a.bbb');
+        });
+
+        it('define module class without name or namespce', function () {
+            var testFilePath = process.cwd()+'/test/unit/data/a-project/node_modules/a-module/src/n1/n2/';
+            var class_without_test_a = require(testFilePath + 'a.js');
+            assert.equal(class_without_test_a.name, 'a');
+            assert.equal(class_without_test_a.namespace, 'n1.n2');
+
+            var class_without_test_b = require(testFilePath + 'b.js');
+            assert.equal(class_without_test_b.name, 'bbb');
+            assert.equal(class_without_test_b.namespace, 'n1.n2');
+
+            var class_without_test_c = require(testFilePath + 'c.js');
+            assert.equal(class_without_test_c.name, 'c');
+            assert.equal(class_without_test_c.namespace, 'n1.n222');
+        });
+
         it('check class.__staticSource', function () {
             var testClass = sojs.using('testClass');
             assert.equal(testClass.$testClass, testClass.__staticSource);
