@@ -399,7 +399,7 @@
                     if (!classObj.namespace && classDirPath) {
                         classObj.namespace = classDirPath
                             .substring(classDirPath.indexOf('src') + 4)
-                            .replace('//', '.').replace('\\', '.');
+                            .replace(/\//gi, '.').replace(/\\/gi, '.');
                     }
                 }
             }

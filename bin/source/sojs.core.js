@@ -344,18 +344,26 @@
          * @return {Object} sojs引用
          */
         define: function(classObj) {
-            // 类名
-            var name = classObj.name || "__tempName";
-            // 命名空间
-            if (this.runtime === "node" && typeof classObj.namespace === "undefined") {
-                // 未填写 namespace 属性的类, 按照其所在的路径自动补全命名空间. 只有在 node 模式下启用此规则.
-                var classDirPath = arguments.callee.caller.arguments[4];
-                if (classDirPath) {
-                    classObj.namespace = classDirPath.substring(classDirPath.indexOf("src") + 4).replace("//", ".").replace("\\", ".");
-                    classObj.namespace = require("path").relative(this.getPath(), classDirPath).replace("//", ".").replace("\\", ".");
+            // 类名和命名空间的处理
+            var name;
+            var namespace = classObj.namespace;
+            // node 模式下, 支持 name 和 namespace 自动补全
+            if (this.runtime === "node") {
+                // name 自动补全为文件名
+                // namespace 自动补全规则为: 查找最近一个 src 文件夹, 以之后的文件夹名作为命名空间                
+                if (typeof classObj.name === "undefined" || typeof classObj.namespace === "undefined") {
+                    var classDirPath = arguments.callee.caller.arguments[4];
+                    var classFullPath = arguments.callee.caller.arguments[3];
+                    if (!classObj.name && classDirPath && classFullPath) {
+                        classObj.name = classFullPath.substring(classDirPath.length + 1, classFullPath.length - 3);
+                    }
+                    if (!classObj.namespace && classDirPath) {
+                        classObj.namespace = classDirPath.substring(classDirPath.indexOf("src") + 4).replace(/\//gi, ".").replace(/\\/gi, ".");
+                    }
                 }
             }
-            var namespace = classObj.namespace || "";
+            name = classObj.name || "__tempName";
+            namespace = classObj.namespace || "";
             // sojs框架属性内部都是用"__"开头存储，避免在运行时与用户设置的属性名冲突
             classObj.__name = name;
             classObj.__namespace = namespace;

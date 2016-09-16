@@ -218,15 +218,22 @@
             return result;
         },
         define: function(classObj) {
-            var name = classObj.name || "__tempName";
-            if (this.runtime === "node" && typeof classObj.namespace === "undefined") {
-                var classDirPath = arguments.callee.caller.arguments[4];
-                if (classDirPath) {
-                    classObj.namespace = classDirPath.substring(classDirPath.indexOf("src") + 4).replace("//", ".").replace("\\", ".");
-                    classObj.namespace = require("path").relative(this.getPath(), classDirPath).replace("//", ".").replace("\\", ".");
+            var name;
+            var namespace = classObj.namespace;
+            if (this.runtime === "node") {
+                if (typeof classObj.name === "undefined" || typeof classObj.namespace === "undefined") {
+                    var classDirPath = arguments.callee.caller.arguments[4];
+                    var classFullPath = arguments.callee.caller.arguments[3];
+                    if (!classObj.name && classDirPath && classFullPath) {
+                        classObj.name = classFullPath.substring(classDirPath.length + 1, classFullPath.length - 3);
+                    }
+                    if (!classObj.namespace && classDirPath) {
+                        classObj.namespace = classDirPath.substring(classDirPath.indexOf("src") + 4).replace(/\//gi, ".").replace(/\\/gi, ".");
+                    }
                 }
             }
-            var namespace = classObj.namespace || "";
+            name = classObj.name || "__tempName";
+            namespace = classObj.namespace || "";
             classObj.__name = name;
             classObj.__namespace = namespace;
             classObj.__full = namespace.length > 1 ? namespace + "." + name : name;

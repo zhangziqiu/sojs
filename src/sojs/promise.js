@@ -18,10 +18,10 @@ sojs.define({
         this.ev = sojs.create(this.event);
         if (func) {
             try {
-                func(sojs.proxy(this, this._resolve), sojs.proxy(this, this._reject));
+                func(sojs.proxy(this, this.getResolve), sojs.proxy(this, this.getReject));
             }
             catch (ex) {
-                this._reject(ex);
+                this.getReject(ex);
             }
         }
     },
@@ -49,15 +49,15 @@ sojs.define({
      * @public
      * @param {*} data 传递的参数
      */
-    _resolve: function (data) {
+    getResolve: function (data) {
         // 返回的是一个thenable对象
         if (data && typeof data.then === 'function') {
             var insidePromise = data;
             var onFullfulled = sojs.proxy(this, function (data) {
-                this._resolve(data);
+                this.getResolve(data);
             });
             var onRejected = sojs.proxy(this, function (data) {
-                this._reject(data);
+                this.getReject(data);
             });
             insidePromise.then(onFullfulled, onRejected);
         }
@@ -74,7 +74,7 @@ sojs.define({
                     this.ev.emit('onFulfilled', data);
                 }
                 catch (ex) {
-                    this._reject(ex);
+                    this.getReject(ex);
                 }
             }
         }
@@ -88,7 +88,7 @@ sojs.define({
      */
     resolve: function (data) {
         var promise = sojs.create(this);
-        promise._resolve(data);
+        promise.getResolve(data);
         return promise;
     },
 
@@ -97,7 +97,7 @@ sojs.define({
      * @public
      * @param {*} data 传递的参数
      */
-    _reject: function (data) {
+    getReject: function (data) {
         this.status = 'rejected';
         this.data = data;
         if (this.ev.eventList && this.ev.eventList['onRejected']) {
@@ -114,7 +114,7 @@ sojs.define({
      */
     reject: function (data) {
         var promise = sojs.create(this);
-        promise._reject(data);
+        promise.getReject(data);
         return promise;
     },
 
@@ -134,14 +134,14 @@ sojs.define({
             var args = Array.prototype.slice.apply(arguments);
             var callback = function (err) {
                 if (err) {
-                    this._reject(err);
+                    this.getReject(err);
                 }
                 else {
                     var returnDataArray = Array.prototype.slice.call(arguments, 1);
                     if (returnDataArray.length <= 1) {
                         returnDataArray = returnDataArray[0];
                     }
-                    this._resolve(returnDataArray);
+                    this.getResolve(returnDataArray);
                 }
             };
             args.push(sojs.proxy(promise, callback));
@@ -165,10 +165,10 @@ sojs.define({
         // 创建一个新的promise并返回
         var promise = sojs.create('sojs.promise');
         var promiseResolveCallback = sojs.proxy(promise, function (data) {
-            this._resolve(data['onFulfilled']);
+            this.getResolve(data['onFulfilled']);
         });
         var promiseRejectCallback = sojs.proxy(promise, function (data) {
-            this._reject(data['onRejected']);
+            this.getReject(data['onRejected']);
         });
 
         this.ev.bind('onFulfilled', onFulfilled);
@@ -179,13 +179,13 @@ sojs.define({
         // 检测当前的promise是否已经执行完毕
         if (this.status === 'fulfilled') {
             setTimeout(sojs.proxy(this, function () {
-                this._resolve(this.data);
+                this.getResolve(this.data);
             }), 0);
 
         }
         else if (this.status === 'rejected') {
             setTimeout(sojs.proxy(this, function () {
-                this._reject(this.data);
+                this.getReject(this.data);
             }), 0);
         }
 
@@ -214,7 +214,7 @@ sojs.define({
         var promise = sojs.create(this);
         var ev = sojs.create('sojs.event');
         ev.bind('error', sojs.proxy(promise, function (error) {
-            this._reject(error);
+            this.getReject(error);
         }));
 
         var eventGroup = [];
@@ -244,7 +244,7 @@ sojs.define({
             for (var key in data) {
                 promiseData.push(data[key]);
             }
-            this._resolve(promiseData);
+            this.getResolve(promiseData);
         }.proxy(promise));
 
         return promise;
@@ -260,10 +260,10 @@ sojs.define({
         var promise = sojs.create(this);
         var ev = sojs.create('sojs.event');
         ev.bind('success', sojs.proxy(promise, function (data) {
-            this._resolve(data);
+            this.getResolve(data);
         }));
         ev.bind('error', sojs.proxy(promise, function (error) {
-            this._reject(error);
+            this.getReject(error);
         }));
 
         var eventGroup = [];
