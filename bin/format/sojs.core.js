@@ -3,6 +3,9 @@
         name: "sojs",
         namespace: "",
         classes: {},
+        classesCache: {},
+        path: {},
+        pathCache: {},
         noop: function() {},
         $sojs: function() {
             var config = {};
@@ -29,8 +32,6 @@
             this.setPath(config.path);
             this.global.sojs = this.global.sojs || this;
         },
-        path: {},
-        pathCache: {},
         getPath: function(namespace) {
             var namespaceArray = namespace ? namespace.split(".") : false;
             var node = this.path;
@@ -171,15 +172,17 @@
             };
         },
         find: function(name) {
-            var result;
-            var nameArray = name.split(".");
-            result = this.classes[nameArray[0]];
-            for (var i = 1, count = nameArray.length; i < count; i++) {
-                if (result && result[nameArray[i]]) {
-                    result = result[nameArray[i]];
-                } else {
-                    result = null;
-                    break;
+            var result = this.classesCache[name];
+            if (!result) {
+                var nameArray = name.split(".");
+                result = this.classes[nameArray[0]];
+                for (var i = 1, count = nameArray.length; i < count; i++) {
+                    if (result && result[nameArray[i]]) {
+                        result = result[nameArray[i]];
+                    } else {
+                        result = null;
+                        break;
+                    }
                 }
             }
             return result;
@@ -300,6 +303,7 @@
             if (this.runtime === "node" && arguments.callee.caller.arguments[2]) {
                 arguments.callee.caller.arguments[2].exports = classObj;
             }
+            this.classesCache[classObj.___full] = classObj;
             return classObj;
         }
     };

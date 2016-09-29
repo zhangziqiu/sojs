@@ -11,7 +11,15 @@
         namespace: "",
         // 类对象都注册到sojs.classes属性上
         classes: {},
-        // 空函数
+        // 类索引.
+        classesCache: {},
+        // 存储命名空间的目录树
+        path: {},
+        // 缓存命名空间的路径
+        pathCache: {},
+        /**
+         * 空函数
+         */
         noop: function() {},
         /**
          * 静态构造函数
@@ -48,10 +56,6 @@
             this.setPath(config.path);
             this.global.sojs = this.global.sojs || this;
         },
-        // 存储命名空间的目录树
-        path: {},
-        // 缓存命名空间的路径
-        pathCache: {},
         /**
          * 从目录树中, 返回指定命名空间的目录
          * @public
@@ -264,15 +268,17 @@
          * @return {Object} 类引用
          */
         find: function(name) {
-            var result;
-            var nameArray = name.split(".");
-            result = this.classes[nameArray[0]];
-            for (var i = 1, count = nameArray.length; i < count; i++) {
-                if (result && result[nameArray[i]]) {
-                    result = result[nameArray[i]];
-                } else {
-                    result = null;
-                    break;
+            var result = this.classesCache[name];
+            if (!result) {
+                var nameArray = name.split(".");
+                result = this.classes[nameArray[0]];
+                for (var i = 1, count = nameArray.length; i < count; i++) {
+                    if (result && result[nameArray[i]]) {
+                        result = result[nameArray[i]];
+                    } else {
+                        result = null;
+                        break;
+                    }
                 }
             }
             return result;
@@ -452,6 +458,8 @@
             if (this.runtime === "node" && arguments.callee.caller.arguments[2]) {
                 arguments.callee.caller.arguments[2].exports = classObj;
             }
+            // 添加类索引
+            this.classesCache[classObj.___full] = classObj;
             return classObj;
         }
     };
