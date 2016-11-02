@@ -325,7 +325,7 @@
         reload: function (name) {
             var result = this.find(name);
             if (result) {
-                result.__registed = false;
+                result.__status = 2;
                 if (this.runtime === 'node') {
                     var classPath = this.getClassPath(name);
                     delete require.cache[require.resolve(classPath)];
@@ -371,13 +371,30 @@
          */
         using: function (name) {
             var result = this.find(name);
-            if (!result) {
-                // 加载模块文件, 仅限node模式. node模式属于本地存储, 相当于所有文件已经加载完毕.
-                // 在browser模式下, 应该在入口对象的deps中指定main函数需要的依赖模块.
-                if (this.runtime === 'node') {
-                    require(this.getClassPath(name));
-                    result = this.find(name);
+            // node模式下, 尝试使用require加载目标类.
+            if (this.runtime === "node") {
+                if (!result) {
+                    // 类引用为空, 如果require失败则直接抛出异常
+                    try {
+                        require(this.getClassPath(name));
+                    }
+                    catch (ex) {
+                        throw ex;
+                    }
                 }
+                else {
+                    // 类引用不为空, 但是可能是在初始化前置命名空间时创建的空对象.
+                    // 所以尝试进行一次命名空间类加载, 如果命名空间类不存在, 则设置__isBlankNamespace为ture
+                    if (!result.__status || result.__status === 1) {
+                        try {
+                            require(this.getClassPath(name));
+                        }
+                        catch (ex) {
+                            result.__status = 2;
+                        }
+                    }
+                }
+                result = this.find(name);
             }
             return result;
         },
@@ -418,6 +435,8 @@
             classObj.__full = namespace.length > 1 ? namespace + '.' + name : name;
             classObj.__deps = classObj.deps;
             classObj.__sojs = this;
+            // 1:preinit, 2:init, 3:registed
+            classObj.__status = 2;
             // 动态构造函数
             classObj.__constructor = function (p1, p2, p3, p4, p5) {
                 // 对需要深度克隆的属性进行克隆
@@ -467,7 +486,7 @@
             for (var i = 0; i < count; i++) {
                 tempName = preNamespaces[i];
                 if (tempName) {
-                    currentClassObj[tempName] = currentClassObj[tempName] || {};
+                    currentClassObj[tempName] = currentClassObj[tempName] || { __status: 1 };
                     currentClassObj = currentClassObj[tempName];
                 }
             }
@@ -479,10 +498,17 @@
             var currentNamespace = currentClassObj;
             currentClassObj = currentClassObj[name];
 
-
             // 新注册类
-            if (!currentClassObj.__name || !currentClassObj.__registed) {
-                classObj.__registed = true;
+            if (!currentClassObj.__name || currentClassObj.__status !== 3) {
+                // preinit表示当前命名空间在子类define时被初始化的. 此时需要对已经挂载的子类进行复制.
+                if (!currentClassObj.__status || currentClassObj.__status === 1) {
+                    for (var key in currentNamespace[name]) {
+                        if (key && currentNamespace[name].hasOwnProperty(key)) {
+                            classObj[key] = currentNamespace[name][key];
+                        }
+                    }
+                }
+                classObj.__status = 3;
                 currentNamespace[name] = classObj;
                 classObj = currentNamespace[name];
 

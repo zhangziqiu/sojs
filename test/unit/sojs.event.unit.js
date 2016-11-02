@@ -6,7 +6,6 @@ describe('sojs.event', function () {
     describe('basic', function () {
         it('clone property', function () {
             var eventClass = sojs.using('sojs.event');
-            console.log(sojs.getClassPath('sojs.event'));
             assert.equal(eventClass.__clones.length, 0);
             var ev = sojs.create(eventClass);
             assert.ok( ev.hasOwnProperty('eventList'));

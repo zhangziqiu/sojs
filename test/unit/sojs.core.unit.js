@@ -42,9 +42,9 @@ describe('sojs.core', function () {
             assert.equal(testClass.__namespace, '');
         });
 
-        it('check class.__registed', function () {
+        it('check class.__status', function () {
             var testClass = sojs.using('testClass');
-            assert.equal(testClass.__registed, true);
+            assert.equal(testClass.__status, 3);
         });
 
         it('check class.__clones', function () {
@@ -364,7 +364,7 @@ describe('sojs.core', function () {
                 'test':process.cwd()
             });
             assert.equal(reloadClass.myValue, 1);
-            sojs.reload('test.unit.data.reloadTestClass');
+            sojs.reload('test.unit.data.reloadTestClass');            
             reloadClass = sojs.using('test.unit.data.reloadTestClass');
             assert.equal(reloadClass.myValue, 2);
         });

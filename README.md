@@ -128,14 +128,14 @@ var id = cookie.getCookie('id');
 sojs支持浏览器和node环境. 使用sojs的第一步就是引入sojs.
 
 #### node 环境
-使用npm或者cnpm安装最新版本的sojs. **注意sojs的npm模块名称叫做"node-sojs"**(因为npm上的sojs名字已经被占用).
+使用npm或者cnpm安装最新版本的sojs.
 在项目根目录运行npm命令:
 ```js
-npm install node-sojs
+npm install sojs
 ```
 在程序的入口处引用:
 ```js
-require('node-sojs');
+require('sojs');
 ```
 整个程序进程只需要引用一次. 
 
@@ -149,7 +149,7 @@ https://github.com/zhangziqiu/sojs
 sojs项目的bin目录下面, 有两个js文件:
 
 * sojs.core.js: 仅包括核心的面向对象编程功能.
-* sojs.js: 除了核心功能, 还包括loader类用于加载依赖类. 以及event类用于处理事件编程. 通常都加载此文件.
+* sojs.js: 除了核心功能, 还包括loader类用于加载依赖类. event类用于处理事件编程. promise类用于异步编程. 如果对大小不是特别敏感, 通常都加载此文件.
 
 将sojs.js下载到项目中后, 直接引用即可:
 
@@ -175,10 +175,10 @@ sojs项目的bin目录下面, 有两个js文件:
 ```
 上面就是一个完整类的代码. 在sojs中, js类文件都是以sojs.define开始, 里面包括一个JSON格式的对象. 开发者可以自由的添加属性和方法, 但是要注意   **此JSON对象的以下属性是sojs框架使用的:**    
     
-* name: 类名, 比如上面的 template
-* namespace: 类所在的命名空间. 比如template类放在了 utility 命名空间下. 我们可以将所有的工具类都放在utility命名空间下,实现类的组织管理.
+* name: 类名, 比如上面的 template.  **在node环境中, 如果不设置name, 则自动以文件名作为类名.**
+* namespace: 类所在的命名空间. 比如template类放在了 utility 命名空间下. 我们可以将所有的工具类都放在utility命名空间下,实现类的组织管理. **在node环境中, 如果不设置namespace, 则自动以文件夹路径作为命名空间.**
 * 名字为 **"类名"** 的函数(比如template类的template函数): 类的构造函数. 使用 sojs.create 创建一个类实例时, 会执行一次构造函数. 
-* 名字为 **"$+类名"** 的函数(比如template类的$template函数): 类的静态构造函数. 当使用sojs.define将一个类引入时, 会执行一次静态构造函数. 创建实例的时候不会执行. 多次执行sojs.define只有第一次引入时会调用一次.
+* 名字为 **"$+类名"** 的函数(比如template类的$template函数): 类的静态构造函数. 当使用sojs.define将一个类引入时, 会执行一次静态构造函数. 创建实例的时候不会执行. **多次执行sojs.define只有第一次引入时会调用一次.**
 * deps: 依赖的类. 使用object描述. key为引用变量名, value为类的全限定性名. 后续可以通过this.key引用到这个依赖类. **在构造函数和静态构造函数执行时,所有的deps依赖类都已经加载完毕.可以安全的使用依赖类.** 在构造函数或者静态构造函数中可以放心的使用this.key的方式使用依赖类. 有关加载依赖的详细说明后面会有单独的章节讲解.
 
 ### 3. 使用类
@@ -195,7 +195,7 @@ sojs项目的bin目录下面, 有两个js文件:
         }
     });
 ```
-main.js可以放置在任意目录,而且也没有命名空间. main的静态构造函数$main作为程序的入口, 在静态构造函数中通过"this.template"的引用到template类. 
+main.js可以放置在任意目录,而且也没有命名空间. main的静态构造函数$main作为程序的入口, 在静态构造函数中通过"this.template"引用到template类. 
 
 #### 3.2 node环境运行
 在node环境中运行main.js, 需要在main.js顶部添加引用sojs库的代码:
