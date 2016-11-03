@@ -1,15 +1,15 @@
-require('../../src/oojs.js');
+require('../../src/sojs.js');
 var Benchmark = require('benchmark');
 var suite = new Benchmark.Suite();
 
 var events = require('events');
-var oojsEvent = oojs.using('oojs.event');
+var sojsEvent = sojs.using('sojs.event');
 
 
 // add tests
-suite.add('oojs.define', {
+suite.add('sojs.define', {
     fn: function () {
-        oojs.define({
+        sojs.define({
             name: 'test',
             namespace: 'my.project',
             $test: function () {
@@ -19,7 +19,7 @@ suite.add('oojs.define', {
                 this.myName3 = 'name3';
             }
         });
-        oojs.classes = {};
+        sojs.classes = {};
     }
 }).on('cycle', function (event) {
     console.log(String(event.target));

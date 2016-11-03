@@ -1,4 +1,4 @@
-oojs.define({
+sojs.define({
     name:'test1',
 	a:1,
 	b:2,

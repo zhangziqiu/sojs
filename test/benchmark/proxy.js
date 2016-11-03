@@ -1,23 +1,23 @@
-require('../../src/oojs.js');
+require('../../src/sojs.js');
 var Benchmark = require('benchmark');
 var suite = new Benchmark.Suite();
 
 var events = require('events');
-var oojsEvent = oojs.using('oojs.event');
+var sojsEvent = sojs.using('sojs.event');
 
-oojs.define({
+sojs.define({
     name: 'testClass',
     say: function(){
         //console.log(this.name);
     }
 });
-var testClass = oojs.using('testClass');
+var testClass = sojs.using('testClass');
 
 
 // add tests
-suite.add('oojs.proxy', {
+suite.add('sojs.proxy', {
     fn: function () {        
-        var proxyFunc = oojs.proxy(testClass, testClass.say);
+        var proxyFunc = sojs.proxy(testClass, testClass.say);
         proxyFunc();        
     }
 }).on('cycle', function (event) {
