@@ -163,8 +163,8 @@ sojs项目的bin目录下面, 有两个js文件:
 ```js
     //template类提供一个render方法用于模板和数据的拼接
 	sojs.define({
-		name: 'template',
-		namespace: 'utility',
+		name: 'template', // node环境可忽略, name取值为文件名
+		namespace: 'utility', // node环境可忽略, namespace取值为相对于src的文件夹路径
 		render: function (source, data) {
 			var regexp = /{(.*?)}/g;
 			return source.replace(regexp, function (match, subMatch, index, s) {
@@ -202,7 +202,7 @@ main.js可以放置在任意目录,而且也没有命名空间. main的静态构
 
 ```js
     //引用sojs库
-    require('node-sojs');
+    require('sojs');
     //后面就是main类的完整代码.
     sojs.define({
         name: 'main',
