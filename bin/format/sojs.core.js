@@ -190,7 +190,7 @@
         reload: function(name) {
             var result = this.find(name);
             if (result) {
-                result.__registed = false;
+                result.__status = 2;
                 if (this.runtime === "node") {
                     var classPath = this.getClassPath(name);
                     delete require.cache[require.resolve(classPath)];
@@ -212,11 +212,23 @@
         },
         using: function(name) {
             var result = this.find(name);
-            if (!result) {
-                if (this.runtime === "node") {
-                    require(this.getClassPath(name));
-                    result = this.find(name);
+            if (this.runtime === "node") {
+                if (!result) {
+                    try {
+                        require(this.getClassPath(name));
+                    } catch (ex) {
+                        throw ex;
+                    }
+                } else {
+                    if (!result.__status || result.__status === 1) {
+                        try {
+                            require(this.getClassPath(name));
+                        } catch (ex) {
+                            result.__status = 2;
+                        }
+                    }
                 }
+                result = this.find(name);
             }
             return result;
         },
@@ -242,6 +254,7 @@
             classObj.__full = namespace.length > 1 ? namespace + "." + name : name;
             classObj.__deps = classObj.deps;
             classObj.__sojs = this;
+            classObj.__status = 2;
             classObj.__constructor = function(p1, p2, p3, p4, p5) {
                 if (this.__clones && this.__clones.length > 0) {
                     for (var i = 0, count = this.__clones.length; i < count; i++) {
@@ -277,15 +290,24 @@
             for (var i = 0; i < count; i++) {
                 tempName = preNamespaces[i];
                 if (tempName) {
-                    currentClassObj[tempName] = currentClassObj[tempName] || {};
+                    currentClassObj[tempName] = currentClassObj[tempName] || {
+                        __status: 1
+                    };
                     currentClassObj = currentClassObj[tempName];
                 }
             }
             currentClassObj[name] = currentClassObj[name] || {};
             var currentNamespace = currentClassObj;
             currentClassObj = currentClassObj[name];
-            if (!currentClassObj.__name || !currentClassObj.__registed) {
-                classObj.__registed = true;
+            if (!currentClassObj.__name || currentClassObj.__status !== 3) {
+                if (!currentClassObj.__status || currentClassObj.__status === 1) {
+                    for (var key in currentNamespace[name]) {
+                        if (key && currentNamespace[name].hasOwnProperty(key)) {
+                            classObj[key] = currentNamespace[name][key];
+                        }
+                    }
+                }
+                classObj.__status = 3;
                 currentNamespace[name] = classObj;
                 classObj = currentNamespace[name];
                 var unloadClass = this.loadDeps(classObj);
