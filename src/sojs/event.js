@@ -94,24 +94,20 @@ sojs.define({
     /**
      * 创建一个 Callback
      * {
-            callback:function(){},	//回调函数
-            data:null,  	        //回调函数返回的数据
-            needTimes:1,			//希望执行的次数, 默认为-1表示循环执行
-            emitTimes:0				//已经执行了的次数, 默认为 0
+            callback:function(){},	// 回调函数
+            data:null,  	        // 回调函数返回的数据
+            needTimes:1,			// 希望执行的次数, 默认为-1表示循环执行
+            emitTimes:0				// 已经执行了的次数, 默认为 0
         }
      */
-    createCallback: function (callback, needTimes, emitTimes) {
-        callback = typeof callback !== 'undefined' ? callback : function () {
-        };
+    createCallback: function (callback, needTimes) {
+        callback = callback;
         needTimes = typeof needTimes !== 'undefined' ? needTimes : -1;
-        emitTimes = typeof emitTimes !== 'undefined' ? emitTimes : 0;
-
         return {
             callback: callback,
             data: null,
             needTimes: needTimes,
-            emitTimes: emitTimes
-
+            emitTimes: 0
         };
     },
 

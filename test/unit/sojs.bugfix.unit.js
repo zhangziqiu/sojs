@@ -3,7 +3,7 @@ var assert = require("assert");
 global.$sojs_config = { proxyName: 'proxy' };
 require('../../src/sojs.js');
 
-describe('sojs.core', function () {
+describe('bugfix', function () {
 
     describe('#using()', function () {
         it('using', function () {
@@ -14,15 +14,25 @@ describe('sojs.core', function () {
                 namespace: 'a.b.c'
             });
             var subClass1 = sojs.using('a.b.c.d');
+            // 前置命名空间的status应该为1
+            assert.equal(sojs.classes.a.b.c.__status, 1);
+            // 引用命名空间时, 第一次会尝试require, 如果失败则设置status为2避免再次require
+            var subClass1Namespace = sojs.using('a.b.c');
+            assert.equal(subClass1Namespace.__status, 2);
 
             // 此时如果前置命名空间被define, 应该保证之前的子类不出问题.
             sojs.define({
-                name: 'c',
-                namespace: 'a.b',
-                testProperty: 'class-c-test'
-            });            
-            var subClass2 = sojs.using('a.b.c.d');
-            assert.equal(subClass1, subClass2);
+                name: 'd1',
+                namespace: 'a1.b1.c1'
+            });
+
+            var subClass2_1 = sojs.using('a1.b1.c1.d1');
+            sojs.define({
+                name: 'c1',
+                namespace: 'a1.b1'
+            });
+            var subClass2_2 = sojs.using('a1.b1.c1.d1');
+            assert.equal(subClass2_1, subClass2_2);
         });
     });
 

@@ -1,6 +1,6 @@
 var assert = require("assert");
 //sojs初始化时的配置变量。必须在sojs加载前载入
-global.$sojs_config = { proxyName : 'proxy' };
+global.$sojs_config = { proxyName: 'proxy' };
 require('../../src/sojs.js');
 
 describe('sojs.core', function () {
@@ -18,18 +18,18 @@ describe('sojs.core', function () {
                 name: 'testClass',
                 namespace: '',
                 deps: {
-                    testDepsClass:'testDepsClass'
+                    testDepsClass: 'testDepsClass'
                 },
                 $testClass: function () {
                     this.staticProperty = 'testClass-static-property-value';
                 }
             });
 
-			var testDepsClass = sojs.using('testDepsClass');
+            var testDepsClass = sojs.using('testDepsClass');
             var testClass = sojs.using('testClass');
             assert.equal(testDepsClass.staticProperty, 'testDepsClass-static-property-value');
-			assert.equal(testClass.staticProperty, 'testClass-static-property-value');
-			assert.equal(testClass.testDepsClass.staticProperty, 'testDepsClass-static-property-value');
+            assert.equal(testClass.staticProperty, 'testClass-static-property-value');
+            assert.equal(testClass.testDepsClass.staticProperty, 'testDepsClass-static-property-value');
         });
 
         it('check class.__name', function () {
@@ -60,11 +60,11 @@ describe('sojs.core', function () {
                     p1name: 'p1.p1name-value'
                 },
                 p2: true,
-                p3: [1,2,3],
+                p3: [1, 2, 3],
                 p4: new Date(),
                 p5: 'stringKey',
-                deps:{
-                    depsClass:'depsClass'
+                deps: {
+                    depsClass: 'depsClass'
                 }
             });
 
@@ -80,7 +80,7 @@ describe('sojs.core', function () {
         });
 
         it('define class without name or namespce', function () {
-            var testFilePath = process.cwd()+'/test/unit/data/a-project/src/a/b/';
+            var testFilePath = process.cwd() + '/test/unit/data/a-project/src/a/b/';
             var class_without_test_c = require(testFilePath + 'c.js');
             assert.equal(class_without_test_c.name, 'c');
             assert.equal(class_without_test_c.namespace, 'a.b');
@@ -95,7 +95,7 @@ describe('sojs.core', function () {
         });
 
         it('define module class without name or namespce', function () {
-            var testFilePath = process.cwd()+'/test/unit/data/a-project/node_modules/a-module/src/n1/n2/';
+            var testFilePath = process.cwd() + '/test/unit/data/a-project/node_modules/a-module/src/n1/n2/';
             var class_without_test_a = require(testFilePath + 'a.js');
             assert.equal(class_without_test_a.name, 'a');
             assert.equal(class_without_test_a.namespace, 'n1.n2');
@@ -120,14 +120,14 @@ describe('sojs.core', function () {
         });
 
         it('check multi-define a class', function () {
-			sojs.define({
+            sojs.define({
                 name: 'testMultiDefineClass',
                 namespace: '',
                 $testMultiDefineClass: function () {
                     this.staticProperty = 'static-property-value';
                 }
             });
-		
+
             sojs.define({
                 name: 'testMultiDefineClass',
                 namespace: '',
@@ -145,36 +145,45 @@ describe('sojs.core', function () {
             // 重复定义一个类, 第二次不会执行
             assert.ok(testClass.__constructorSource.toString().indexOf('instance-property-value') <= 0);
 
-        });		
-		
-		it('bug case: change prototype property in dynamic constructor', function () {
-			sojs.define({
-				name: 'testDynamicPrototype',
+        });
+
+        it('bug case: change prototype property in dynamic constructor', function () {
+            sojs.define({
+                name: 'testDynamicPrototype',
                 namespace: '',
-				config: { name:'config-name-value'},
-				testDynamicPrototype: function (name) {
-					this.config.name = name;
-				}
-			});		
-			var testClass = sojs.using('testDynamicPrototype');
-			var testImp1 = sojs.create('testDynamicPrototype', 'test-1');
-			var testImp2 = sojs.create('testDynamicPrototype', 'test-2');
-			
-			assert.equal(testClass.config.name, 'config-name-value');
-			assert.equal(testImp1.config.name, 'test-1');
-			assert.equal(testImp2.config.name, 'test-2');
-			
+                config: { name: 'config-name-value' },
+                testDynamicPrototype: function (name) {
+                    this.config.name = name;
+                }
+            });
+            var testClass = sojs.using('testDynamicPrototype');
+            var testImp1 = sojs.create('testDynamicPrototype', 'test-1');
+            var testImp2 = sojs.create('testDynamicPrototype', 'test-2');
+
+            assert.equal(testClass.config.name, 'config-name-value');
+            assert.equal(testImp1.config.name, 'test-1');
+            assert.equal(testImp2.config.name, 'test-2');
+
         });
     });
 
     describe('#using()', function () {
         it('using', function () {
             sojs.setPath({
-                'test':process.cwd()
+                'test': process.cwd()
             });
 
             var usingClassA = sojs.using('test.unit.data.usingClassA');
             assert.equal(usingClassA.name, 'usingClassA');
+        });
+
+        it('using errors', function () {
+            try{
+                sojs.using('a.b1');
+            }
+            catch(ex){
+                assert.equal(ex.code, 'MODULE_NOT_FOUND');
+            }
         });
     });
 
@@ -182,21 +191,21 @@ describe('sojs.core', function () {
         it('deepClone', function () {
             //deepClone 最多克隆深度为10层.超过10层的对象直接返回不进行克隆
             var max = {
-                a1:{
-                    a2:{
-                        a3:{
-                            a4:{
-                                a5:{
-                                    a6:{
-                                        a7:{
-                                            a8:{
-                                              a9:{
-                                                  a10:{
-                                                      a11:{
-                                                          myValue:11
-                                                      }
-                                                  }
-                                              }
+                a1: {
+                    a2: {
+                        a3: {
+                            a4: {
+                                a5: {
+                                    a6: {
+                                        a7: {
+                                            a8: {
+                                                a9: {
+                                                    a10: {
+                                                        a11: {
+                                                            myValue: 11
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -232,11 +241,11 @@ describe('sojs.core', function () {
                 $createTestClass: function () {
                     this.staticProperty = 'static-property-value';
                 },
-				createTestClass: function () {
+                createTestClass: function () {
                     this.instanceProperty = 'instance-property-value';
                 }
             });
-		
+
             var classImp = sojs.create('createTestClass');
             assert.equal(classImp.name, 'createTestClass');
             assert.equal(classImp.staticProperty, 'static-property-value');
@@ -253,7 +262,7 @@ describe('sojs.core', function () {
                     p1name: 'p1.p1name-value'
                 },
                 p2: true,
-                p3: [1,2,3],
+                p3: [1, 2, 3],
                 p4: new Date(),
                 p5: 'stringKey'
             });
@@ -272,86 +281,86 @@ describe('sojs.core', function () {
             assert.ok(classImp.hasOwnProperty('p4') === true);
         });
     });
-	
-	describe('#other()', function () {
-		it('fastClone', function () {			
-			var sourceObj = {
-				p1: 'p1Value'
-			};
-			
-			var cloneObj = sojs.fastClone(sourceObj);			
-			assert.equal(cloneObj.p1, sourceObj.p1);
-			cloneObj.p1 = 'p1ValueChanged';
-			assert.equal(cloneObj.p1, 'p1ValueChanged');
-			assert.equal(sourceObj.p1, 'p1Value');	
+
+    describe('#other()', function () {
+        it('fastClone', function () {
+            var sourceObj = {
+                p1: 'p1Value'
+            };
+
+            var cloneObj = sojs.fastClone(sourceObj);
+            assert.equal(cloneObj.p1, sourceObj.p1);
+            cloneObj.p1 = 'p1ValueChanged';
+            assert.equal(cloneObj.p1, 'p1ValueChanged');
+            assert.equal(sourceObj.p1, 'p1Value');
         });
 
-		
-		it('setPath, getPath, getClassPath', function () {
-			sojs.setPath('a.b', 'http://a-b-base');
-			sojs.setPath({'a.b.c':'http://a-b-c'});
-			sojs.setPath('a.b.d', 'http://a-b-d');
+
+        it('setPath, getPath, getClassPath', function () {
+            sojs.setPath('a.b', 'http://a-b-base');
+            sojs.setPath({ 'a.b.c': 'http://a-b-c' });
+            sojs.setPath('a.b.d', 'http://a-b-d');
 
             var pathRoot = sojs.getPath();
-			var path1 = sojs.getPath('a.b');
-			var path2 = sojs.getPath('a.b.c');
-			var path3 = sojs.getPath('a.b.d');
-			var path4 = sojs.getClassPath('a.b.e');
+            var path1 = sojs.getPath('a.b');
+            var path2 = sojs.getPath('a.b.c');
+            var path3 = sojs.getPath('a.b.d');
+            var path4 = sojs.getClassPath('a.b.e');
 
             var path = require('path');
-            assert.equal(path.resolve(pathRoot), path.resolve(process.cwd()+'/src/'));
-			assert.equal(path1, 'http://a-b-base');
-			assert.equal(path2, 'http://a-b-c');
-			assert.equal(path3, 'http://a-b-d');
-			assert.equal(path4, 'http://a-b-base/a/b/e.js');			
+            assert.equal(path.resolve(pathRoot), path.resolve(process.cwd() + '/src/'));
+            assert.equal(path1, 'http://a-b-base');
+            assert.equal(path2, 'http://a-b-c');
+            assert.equal(path3, 'http://a-b-d');
+            assert.equal(path4, 'http://a-b-base/a/b/e.js');
         });
-		
-		it('proxy-1', function (done) {
-			var test = {
-				name: 'testName',
+
+        it('proxy-1', function (done) {
+            var test = {
+                name: 'testName',
                 namespace: '',
-				say: function(p1, p2){
-					done();
-					assert.equal(this.name, 'testName');
-					assert.equal(p1, 'p1Value');
-					assert.equal(p2, 'p2Value');
+                say: function (p1, p2) {
+                    done();
+                    assert.equal(this.name, 'testName');
+                    assert.equal(p1, 'p1Value');
+                    assert.equal(p2, 'p2Value');
                     assert.equal(p3, 'p3Value');
                     assert.equal(p4, 'p4Value');
                     assert.equal(p5, 'p5Value');
 
-				}
-			};
-			var p1 = 'p1Value';
-			var p2 = 'p2Value';
+                }
+            };
+            var p1 = 'p1Value';
+            var p2 = 'p2Value';
             var p3 = 'p3Value';
             var p4 = 'p4Value';
             var p5 = 'p5Value';
-			
-			var testProxyFunction = sojs.proxy(test, test.say, p1, p2, p3, p4, p5);
-			setTimeout(function(){
-				testProxyFunction(p1, p2, p3, p4, p5);
-			}, 100);			
+
+            var testProxyFunction = sojs.proxy(test, test.say, p1, p2, p3, p4, p5);
+            setTimeout(function () {
+                testProxyFunction(p1, p2, p3, p4, p5);
+            }, 100);
         });
-		
-		it('proxy-2', function (done) {
-			var test = {
-				name: 'testName',
+
+        it('proxy-2', function (done) {
+            var test = {
+                name: 'testName',
                 namespace: '',
-				say: function(p1, p2){
-					done();
-					assert.equal(this.name, 'testName');
-					assert.equal(p1, 'p1Value');
-					assert.equal(p2, 'p2Value');
-				}
-			};
-			test.say.proxy = sojs.proxy;
-			var p1 = 'p1Value';
-			var p2 = 'p2Value';
-			
-			var testProxyFunction = test.say.proxy(this, p1, p2);			
-			setTimeout(function(){
-				testProxyFunction(p1, p2);
-			}, 100);			
+                say: function (p1, p2) {
+                    done();
+                    assert.equal(this.name, 'testName');
+                    assert.equal(p1, 'p1Value');
+                    assert.equal(p2, 'p2Value');
+                }
+            };
+            test.say.proxy = sojs.proxy;
+            var p1 = 'p1Value';
+            var p2 = 'p2Value';
+
+            var testProxyFunction = test.say.proxy(this, p1, p2);
+            setTimeout(function () {
+                testProxyFunction(p1, p2);
+            }, 100);
         });
 
         it('reload-1', function () {
@@ -361,10 +370,10 @@ describe('sojs.core', function () {
                 myValue: 1
             });
             sojs.setPath({
-                'test':process.cwd()
+                'test': process.cwd()
             });
             assert.equal(reloadClass.myValue, 1);
-            sojs.reload('test.unit.data.reloadTestClass');            
+            sojs.reload('test.unit.data.reloadTestClass');
             reloadClass = sojs.using('test.unit.data.reloadTestClass');
             assert.equal(reloadClass.myValue, 2);
         });
@@ -373,8 +382,8 @@ describe('sojs.core', function () {
             reloadClass = sojs.reload('test.unit.data.reloadTestClass2');
             assert.equal(reloadClass.name, 'reloadTestClass2');
         });
-		
-	});
+
+    });
 
     describe('#bugfix()', function () {
         it('multi-define from file', function () {
@@ -384,7 +393,7 @@ describe('sojs.core', function () {
                 myValue: 1
             });
             sojs.setPath({
-                'test':process.cwd()
+                'test': process.cwd()
             });
             assert.equal(multiDefineClass.myValue, 1);
             require(process.cwd() + '/test/unit/data/multiDefineClass.js');
@@ -402,7 +411,7 @@ describe('sojs.core', function () {
             // classD: 预先define完毕, 直接传递类引用
 
             sojs.setPath({
-                'test':process.cwd()
+                'test': process.cwd()
             });
 
             // 预先定义好ClassB 和 ClassD
@@ -424,10 +433,10 @@ describe('sojs.core', function () {
                 name: 'loadDepsClassA',
                 namespace: 'test.unit.data',
                 deps: {
-                    nodeFs : require('fs'),
-                    classB : 'test.unit.data.loadDepsClassB',
-                    classC : 'test.unit.data.loadDepsClassC',
-                    classD : loadDepsClassD
+                    nodeFs: require('fs'),
+                    classB: 'test.unit.data.loadDepsClassB',
+                    classC: 'test.unit.data.loadDepsClassC',
+                    classD: loadDepsClassD
                 }
             });
 
@@ -455,7 +464,7 @@ describe('sojs.core', function () {
                     }
                 });
             }
-            catch(ex){
+            catch (ex) {
                 done();
             }
 
