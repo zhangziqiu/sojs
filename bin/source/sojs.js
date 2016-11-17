@@ -211,7 +211,7 @@
          */
         deepClone: function(source, depth) {
             if (typeof depth !== "number") {
-                depth = 10;
+                depth = 5;
             }
             var to;
             var nextDepth = depth - 1;
@@ -411,11 +411,14 @@
             classObj.__staticUpdate = function() {
                 // 对类定义进行一次扫描，判断哪些属性需要在创建实例时进行克隆；
                 var needCloneKeyArray = [];
-                for (var key in this) {
-                    if (this.hasOwnProperty(key)) {
-                        var item = this[key];
-                        if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
-                            needCloneKeyArray.push(key);
+                // 浏览器模式下不执行. 避免对dom和bom对象进行克隆
+                if (this.runtime !== "browser") {
+                    for (var key in this) {
+                        if (this.hasOwnProperty(key)) {
+                            var item = this[key];
+                            if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
+                                needCloneKeyArray.push(key);
+                            }
                         }
                     }
                 }
@@ -584,21 +587,20 @@ sojs.define({
     /**
      * 创建一个 Callback
      * {
-            callback:function(){},	//回调函数
-            data:null,  	        //回调函数返回的数据
-            needTimes:1,			//希望执行的次数, 默认为-1表示循环执行
-            emitTimes:0				//已经执行了的次数, 默认为 0
+            callback:function(){},	// 回调函数
+            data:null,  	        // 回调函数返回的数据
+            needTimes:1,			// 希望执行的次数, 默认为-1表示循环执行
+            emitTimes:0				// 已经执行了的次数, 默认为 0
         }
      */
-    createCallback: function(callback, needTimes, emitTimes) {
-        callback = typeof callback !== "undefined" ? callback : function() {};
+    createCallback: function(callback, needTimes) {
+        callback = callback;
         needTimes = typeof needTimes !== "undefined" ? needTimes : -1;
-        emitTimes = typeof emitTimes !== "undefined" ? emitTimes : 0;
         return {
             callback: callback,
             data: null,
             needTimes: needTimes,
-            emitTimes: emitTimes
+            emitTimes: 0
         };
     },
     /**

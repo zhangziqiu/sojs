@@ -211,7 +211,7 @@
          */
         deepClone: function(source, depth) {
             if (typeof depth !== "number") {
-                depth = 10;
+                depth = 5;
             }
             var to;
             var nextDepth = depth - 1;
@@ -411,11 +411,14 @@
             classObj.__staticUpdate = function() {
                 // 对类定义进行一次扫描，判断哪些属性需要在创建实例时进行克隆；
                 var needCloneKeyArray = [];
-                for (var key in this) {
-                    if (this.hasOwnProperty(key)) {
-                        var item = this[key];
-                        if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
-                            needCloneKeyArray.push(key);
+                // 浏览器模式下不执行. 避免对dom和bom对象进行克隆
+                if (this.runtime !== "browser") {
+                    for (var key in this) {
+                        if (this.hasOwnProperty(key)) {
+                            var item = this[key];
+                            if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
+                                needCloneKeyArray.push(key);
+                            }
                         }
                     }
                 }

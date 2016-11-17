@@ -133,7 +133,7 @@
         },
         deepClone: function(source, depth) {
             if (typeof depth !== "number") {
-                depth = 10;
+                depth = 5;
             }
             var to;
             var nextDepth = depth - 1;
@@ -268,11 +268,13 @@
             classObj.__staticSource = classObj["$" + name] || this.noop;
             classObj.__staticUpdate = function() {
                 var needCloneKeyArray = [];
-                for (var key in this) {
-                    if (this.hasOwnProperty(key)) {
-                        var item = this[key];
-                        if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
-                            needCloneKeyArray.push(key);
+                if (this.runtime !== "browser") {
+                    for (var key in this) {
+                        if (this.hasOwnProperty(key)) {
+                            var item = this[key];
+                            if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
+                                needCloneKeyArray.push(key);
+                            }
                         }
                     }
                 }

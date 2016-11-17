@@ -189,7 +189,7 @@ describe('sojs.core', function () {
 
     describe('#deepClone()', function () {
         it('deepClone', function () {
-            //deepClone 最多克隆深度为10层.超过10层的对象直接返回不进行克隆
+            //deepClone 最多克隆深度为5层.超过5层的对象直接返回不进行克隆
             var max = {
                 a1: {
                     a2: {
@@ -197,17 +197,7 @@ describe('sojs.core', function () {
                             a4: {
                                 a5: {
                                     a6: {
-                                        a7: {
-                                            a8: {
-                                                a9: {
-                                                    a10: {
-                                                        a11: {
-                                                            myValue: 11
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        myValue: 7
                                     }
                                 }
                             }
@@ -219,17 +209,17 @@ describe('sojs.core', function () {
             var cloned1 = sojs.deepClone(max);
             var cloned2 = sojs.deepClone(max);
             var cloned3 = sojs.deepClone(max);
-            assert.equal(cloned1.a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11.myValue, 11);
-            assert.equal(cloned2.a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11.myValue, 11);
-            assert.equal(cloned3.a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11.myValue, 11);
-            // 第10层对象应该克隆,clone1的修改不影响clone2
-            cloned1.a1.a2.a3.a4.a5.a6.a7.a8.a9.a10 = 'a10-changed';
-            assert.equal(cloned1.a1.a2.a3.a4.a5.a6.a7.a8.a9.a10, 'a10-changed');
-            assert.equal(cloned2.a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11.myValue, 11);
-            // 第11层对象不克隆,clone12的修改会影响clone3
-            cloned2.a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11 = 'a11-changed';
-            assert.equal(cloned2.a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11, 'a11-changed');
-            assert.equal(cloned3.a1.a2.a3.a4.a5.a6.a7.a8.a9.a10.a11, 'a11-changed');
+            assert.equal(cloned1.a1.a2.a3.a4.a5.a6.myValue, 7);
+            assert.equal(cloned2.a1.a2.a3.a4.a5.a6.myValue, 7);
+            assert.equal(cloned3.a1.a2.a3.a4.a5.a6.myValue, 7);
+            // 第5层对象应该克隆,clone1的修改不影响clone2
+            cloned1.a1.a2.a3.a4.a5 = 'a5-changed';
+            assert.equal(cloned1.a1.a2.a3.a4.a5, 'a5-changed');
+            assert.equal(cloned2.a1.a2.a3.a4.a5.a6.myValue, 7);
+            // 第6层对象不克隆,clone12的修改会影响clone3
+            cloned2.a1.a2.a3.a4.a5.a6 = 'a7-changed';
+            assert.equal(cloned2.a1.a2.a3.a4.a5.a6, 'a7-changed');
+            assert.equal(cloned3.a1.a2.a3.a4.a5.a6, 'a7-changed');
         });
     });
 

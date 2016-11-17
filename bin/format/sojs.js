@@ -133,7 +133,7 @@
         },
         deepClone: function(source, depth) {
             if (typeof depth !== "number") {
-                depth = 10;
+                depth = 5;
             }
             var to;
             var nextDepth = depth - 1;
@@ -268,11 +268,13 @@
             classObj.__staticSource = classObj["$" + name] || this.noop;
             classObj.__staticUpdate = function() {
                 var needCloneKeyArray = [];
-                for (var key in this) {
-                    if (this.hasOwnProperty(key)) {
-                        var item = this[key];
-                        if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
-                            needCloneKeyArray.push(key);
+                if (this.runtime !== "browser") {
+                    for (var key in this) {
+                        if (this.hasOwnProperty(key)) {
+                            var item = this[key];
+                            if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
+                                needCloneKeyArray.push(key);
+                            }
                         }
                     }
                 }
@@ -343,15 +345,14 @@ sojs.define({
         this.groupList = {};
         this.eventGroupIndexer = {};
     },
-    createCallback: function(callback, needTimes, emitTimes) {
-        callback = typeof callback !== "undefined" ? callback : function() {};
+    createCallback: function(callback, needTimes) {
+        callback = callback;
         needTimes = typeof needTimes !== "undefined" ? needTimes : -1;
-        emitTimes = typeof emitTimes !== "undefined" ? emitTimes : 0;
         return {
             callback: callback,
             data: null,
             needTimes: needTimes,
-            emitTimes: emitTimes
+            emitTimes: 0
         };
     },
     createEvent: function(eventName) {
