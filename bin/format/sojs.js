@@ -72,17 +72,21 @@
             node.pathValue = path;
             this.pathCache = {};
         },
-        getClassPath: function(name) {
-            if (!this.pathCache[name]) {
-                this.pathCache[name] = this.getPath(name) + name.replace(/\./gi, "/") + ".js";
+        getClassPath: function(name, noExtension) {
+            var result = this.pathCache[name];
+            if (!result) {
                 var basePath = this.getPath(name);
                 var basePathIndex = basePath.length - 1;
                 if (basePath.lastIndexOf("\\") !== basePathIndex && basePath.lastIndexOf("/") !== basePathIndex) {
                     basePath = basePath + "/";
                 }
-                this.pathCache[name] = basePath + name.replace(/\./gi, "/") + ".js";
+                result = basePath + name.replace(/\./gi, "/") + ".js";
+                this.pathCache[name] = result;
             }
-            return this.pathCache[name];
+            if (noExtension) {
+                result = result.replace(".js", "");
+            }
+            return result;
         },
         loadDeps: function(classObj, recording) {
             recording = recording || {};
@@ -268,13 +272,11 @@
             classObj.__staticSource = classObj["$" + name] || this.noop;
             classObj.__staticUpdate = function() {
                 var needCloneKeyArray = [];
-                if (this.runtime !== "browser") {
-                    for (var key in this) {
-                        if (this.hasOwnProperty(key)) {
-                            var item = this[key];
-                            if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
-                                needCloneKeyArray.push(key);
-                            }
+                for (var key in this) {
+                    if (this.hasOwnProperty(key)) {
+                        var item = this[key];
+                        if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
+                            needCloneKeyArray.push(key);
                         }
                     }
                 }
@@ -674,7 +676,7 @@ sojs.define({
         return promise;
     },
     "catch": function(onRejected) {
-        this.then(null, onRejected);
+        return this.then(null, onRejected);
     },
     all: function(promiseArray) {
         var promise = sojs.create(this);

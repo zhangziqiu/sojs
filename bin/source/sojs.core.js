@@ -57,10 +57,11 @@
             this.global.sojs = this.global.sojs || this;
         },
         /**
-         * 从目录树中, 返回指定命名空间的目录
+         * 从目录树中, 返回指定命名空间的磁盘根目录, 注意是根目录. 
+         * 如果想要获取到类或命名空间的完成路径,请使用 getClassPath
          * @public
          * @param {string} namespace 命名空间, 比如"A.B.C"
-         * @return {string} 路径, 比如 'http://www.123.com/a/b' 或 '/home/user/a/b'
+         * @return {string} 路径, 比如设置了'A.B'的路径为'c:\src\', 则返回'c:\src\'. 而不是 'c:\src\A\B'
          */
         getPath: function(namespace) {
             var namespaceArray = namespace ? namespace.split(".") : false;
@@ -118,20 +119,26 @@
          * 获取类的资源文件相对路径
          * @public
          * @param {string} name 类的全限定性名(命名空间+类名, 比如 a.b.c)
+         * @param {boolean} noExtension true表示返回的路径中不包含'.js'后缀
          * @return {string} 资源文件的相对路径(比如 /a/b/c.js)
          */
-        getClassPath: function(name) {
-            if (!this.pathCache[name]) {
-                this.pathCache[name] = this.getPath(name) + name.replace(/\./gi, "/") + ".js";
+        getClassPath: function(name, noExtension) {
+            var result = this.pathCache[name];
+            if (!result) {
                 var basePath = this.getPath(name);
                 // 为路径添加末尾的斜杠
                 var basePathIndex = basePath.length - 1;
                 if (basePath.lastIndexOf("\\") !== basePathIndex && basePath.lastIndexOf("/") !== basePathIndex) {
                     basePath = basePath + "/";
                 }
-                this.pathCache[name] = basePath + name.replace(/\./gi, "/") + ".js";
+                result = basePath + name.replace(/\./gi, "/") + ".js";
+                this.pathCache[name] = result;
             }
-            return this.pathCache[name];
+            // 不需要'.js'后缀. 需要获取目录是可以使用
+            if (noExtension) {
+                result = result.replace(".js", "");
+            }
+            return result;
         },
         /**
          * 加载依赖
@@ -411,14 +418,11 @@
             classObj.__staticUpdate = function() {
                 // 对类定义进行一次扫描，判断哪些属性需要在创建实例时进行克隆；
                 var needCloneKeyArray = [];
-                // 浏览器模式下不执行. 避免对dom和bom对象进行克隆
-                if (this.runtime !== "browser") {
-                    for (var key in this) {
-                        if (this.hasOwnProperty(key)) {
-                            var item = this[key];
-                            if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
-                                needCloneKeyArray.push(key);
-                            }
+                for (var key in this) {
+                    if (this.hasOwnProperty(key)) {
+                        var item = this[key];
+                        if (typeof item === "object" && item !== null && key !== "deps" && key.indexOf("__") !== 0 && (!classObj.__deps || !classObj.__deps[key])) {
+                            needCloneKeyArray.push(key);
                         }
                     }
                 }

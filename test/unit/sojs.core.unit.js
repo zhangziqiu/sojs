@@ -296,6 +296,7 @@ describe('sojs.core', function () {
             var path2 = sojs.getPath('a.b.c');
             var path3 = sojs.getPath('a.b.d');
             var path4 = sojs.getClassPath('a.b.e');
+            var path5 = sojs.getClassPath('a.b.e', true);
 
             var path = require('path');
             assert.equal(path.resolve(pathRoot), path.resolve(process.cwd() + '/src/'));
@@ -303,6 +304,7 @@ describe('sojs.core', function () {
             assert.equal(path2, 'http://a-b-c');
             assert.equal(path3, 'http://a-b-d');
             assert.equal(path4, 'http://a-b-base/a/b/e.js');
+            assert.equal(path5, 'http://a-b-base/a/b/e');
         });
 
         it('proxy-1', function (done) {

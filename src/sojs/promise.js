@@ -201,7 +201,7 @@ sojs.define({
      * @return {sojs.promise} promise对象
      */
     catch: function (onRejected) {
-        this.then(null, onRejected);
+        return this.then(null, onRejected);
     },
 
     /**
