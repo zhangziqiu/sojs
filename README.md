@@ -18,7 +18,7 @@ var cookie = sojs.using('sojs.utility.cookie');
 var id = cookie.getCookie('id');
 ```
 
-sojs 是 **编程框架** 而非 **类库** , 适用于所有的js项目, 可以和各种规范如ADM,CDM等一起使用. 
+sojs 是 **编程框架** 而非 **类库** , 适用于所有的js项目, 可以和各种规范如AMD,CMD等一起使用. 
 sojs中的so即Simple Object Oriented, 简单面向对象.
 与传统的面向对象理论略有不同, 我们认为: **对象是组织代码的最小单位.** 
 
