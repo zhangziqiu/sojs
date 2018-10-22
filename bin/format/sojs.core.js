@@ -30,6 +30,7 @@
                 Function.prototype[config.proxyName] = this.proxy;
             }
             this.setPath(config.path);
+            this.deepClone = this.deepClone.proxy(this);
             this.global.sojs = this.global.sojs || this;
         },
         getPath: function(namespace) {
@@ -257,13 +258,13 @@
             classObj.__namespace = namespace;
             classObj.__full = namespace.length > 1 ? namespace + "." + name : name;
             classObj.__deps = classObj.deps;
-            classObj.__sojs = this;
+            classObj.__deepClone = this.deepClone;
             classObj.__status = 2;
             classObj.__constructor = function(p1, p2, p3, p4, p5) {
                 if (this.__clones && this.__clones.length > 0) {
                     for (var i = 0, count = this.__clones.length; i < count; i++) {
                         var key = this.__clones[i];
-                        this[key] = this.__sojs.deepClone(this[key]);
+                        this[key] = this.__deepClone(this[key]);
                     }
                 }
                 this.__constructorSource(p1, p2, p3, p4, p5);

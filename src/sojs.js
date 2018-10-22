@@ -62,6 +62,11 @@
                 Function.prototype[config.proxyName] = this.proxy;
             }
             this.setPath(config.path);
+
+            // deepClone会被赋值到class的__deepClone属性.因为是递归调用,所以需要修改指针.
+            this.deepClone = this.deepClone.proxy(this);
+
+            // 设置全局对象引用
             this.global.sojs = this.global.sojs || this;
         },
 
@@ -441,7 +446,7 @@
             classObj.__namespace = namespace;
             classObj.__full = namespace.length > 1 ? namespace + '.' + name : name;
             classObj.__deps = classObj.deps;
-            classObj.__sojs = this;
+            classObj.__deepClone = this.deepClone;
             // 1:preinit, 2:init, 3:registed
             classObj.__status = 2;
             // 动态构造函数
@@ -450,7 +455,7 @@
                 if (this.__clones && this.__clones.length > 0) {
                     for (var i = 0, count = this.__clones.length; i < count; i++) {
                         var key = this.__clones[i];
-                        this[key] = this.__sojs.deepClone(this[key]);
+                        this[key] = this.__deepClone(this[key]);
                     }
                 }
                 this.__constructorSource(p1, p2, p3, p4, p5);
