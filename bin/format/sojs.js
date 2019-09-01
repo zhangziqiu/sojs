@@ -116,6 +116,7 @@
                                 classObj[key] = require(this.getClassPath(classFullName));
                             } catch (ex) {
                                 unloadClass.push(classFullName);
+                                throw ex;
                             }
                         }
                         if (!classObj[key]) {

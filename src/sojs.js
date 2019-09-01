@@ -207,6 +207,7 @@
                             }
                             catch (ex) {
                                 unloadClass.push(classFullName);
+                                throw ex;
                             }
                         }
 
