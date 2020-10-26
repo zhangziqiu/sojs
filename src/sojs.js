@@ -19,7 +19,8 @@
         path: {},
         // 缓存命名空间的路径
         pathCache: {},
-
+        // 存储加载依赖错误信息
+        loadErrorInfo: {},
         /**
          * 空函数
          */
@@ -206,7 +207,7 @@
                                 classObj[key] = require(this.getClassPath(classFullName));
                             }
                             catch (ex) {
-                                unloadClass.push(classFullName);
+                                this.loadErrorInfo[classFullName] = ex.stack.toString();
                             }
                         }
 
@@ -538,8 +539,12 @@
                     }
                     else {
                         // 发现未加载的依赖类, 抛出异常
-                        throw new Error('class "' + classObj.name + '"'
-                            + ' loadDeps error:' + unloadClass.join(','));
+                        var errorInfo = 'class "' + classObj.name + '" load deps error\n';
+                        for (var i = 0; i < unloadClass.length; i ++) {
+                            errorInfo += '[' + unloadClass[i] + ']:'
+                            + this.loadErrorInfo[unloadClass[i]] + '\n';
+                        }
+                        throw new Error(errorInfo);
                     }
                 }
                 else {
