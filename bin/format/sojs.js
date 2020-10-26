@@ -6,6 +6,7 @@
         classesCache: {},
         path: {},
         pathCache: {},
+        loadErrorInfo: {},
         noop: function() {},
         $sojs: function() {
             var config = {};
@@ -115,7 +116,7 @@
                             try {
                                 classObj[key] = require(this.getClassPath(classFullName));
                             } catch (ex) {
-                                unloadClass.push(classFullName);
+                                this.loadErrorInfo[classFullName] = ex.stack.toString();
                             }
                         }
                         if (!classObj[key]) {
@@ -321,7 +322,11 @@
                     if (this.runtime === "browser" && this.loader) {
                         this.loader.loadDepsBrowser(classObj, unloadClass);
                     } else {
-                        throw new Error('class "' + classObj.name + '"' + " loadDeps error:" + unloadClass.join(","));
+                        var errorInfo = 'class "' + classObj.name + '" load deps error\n';
+                        for (var i = 0; i < unloadClass.length; i++) {
+                            errorInfo += "[" + unloadClass[i] + "]:" + this.loadErrorInfo[unloadClass[i]] + "\n";
+                        }
+                        throw new Error(errorInfo);
                     }
                 } else {
                     classObj.__static();
@@ -676,7 +681,7 @@ sojs.define({
         }
         return promise;
     },
-    "catch": function(onRejected) {
+    catch: function(onRejected) {
         return this.then(null, onRejected);
     },
     all: function(promiseArray) {
