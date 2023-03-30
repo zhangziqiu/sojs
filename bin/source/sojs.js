@@ -494,6 +494,8 @@
                     // 依赖类全部加载完毕, 运行静态构造函数
                     classObj.__static();
                 }
+            } else {
+                classObj = currentClassObj;
             }
             // 兼容node的require命令, 因为闭包问题导致sojs.define中的module始终指向sojs.js文件的module.使用eval和Function无法解决.
             // 故通过callee.caller先上寻找sojs.define的调用者, 从调用者环境中获取module.
@@ -501,7 +503,7 @@
                 arguments.callee.caller.arguments[2].exports = classObj;
             }
             // 添加类索引
-            this.classesCache[classObj.___full] = classObj;
+            this.classesCache[classObj.__full] = classObj;
             return classObj;
         }
     };

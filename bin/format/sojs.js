@@ -331,11 +331,13 @@
                 } else {
                     classObj.__static();
                 }
+            } else {
+                classObj = currentClassObj;
             }
             if (this.runtime === "node" && arguments.callee.caller.arguments[2]) {
                 arguments.callee.caller.arguments[2].exports = classObj;
             }
-            this.classesCache[classObj.___full] = classObj;
+            this.classesCache[classObj.__full] = classObj;
             return classObj;
         }
     };
