@@ -174,11 +174,14 @@ var make = {
             level: 9
 
         });
-        var inp = fs.createReadStream(this.gzip.path + '_temp');
+        var tmpPath = this.gzip.path + '_temp';
+        var inp = fs.createReadStream(tmpPath);
         var out = fs.createWriteStream(this.gzip.path);
+        inp.on('close', function () {
+            fs.unlinkSync(tmpPath);
+        });
         inp.pipe(gz).pipe(out);
         console.log('compile :' + this.gzip.path + '" successful!');
-        fs.unlinkSync(this.gzip.path + '_temp');
 
         console.log('build finished');
     },
@@ -243,11 +246,14 @@ var make = {
             level: 9
 
         });
-        var inp = fs.createReadStream(this.gzipCore.path + '_temp');
+        var tmpPath = this.gzipCore.path + '_temp';
+        var inp = fs.createReadStream(tmpPath);
         var out = fs.createWriteStream(this.gzipCore.path);
+        inp.on('close', function () {
+            fs.unlinkSync(tmpPath);
+        });
         inp.pipe(gz).pipe(out);
         console.log('===core=== compile :' + this.gzipCore.path + '" successful!');
-        fs.unlinkSync(this.gzipCore.path + '_temp');
 
         console.log('===core=== build finished');
     }
